@@ -23,15 +23,15 @@ type DebuggingProviderBase
         addDefaultProbingLocation = true
     )
 
-    let asm = Assembly.GetExecutingAssembly()
+    let thisAssembly  = Assembly.GetExecutingAssembly()
 
     // check we contain a copy of runtime files, and are not referencing the runtime DLL
-    do assert (typeof<TpRuntime>.Assembly.GetName().Name = asm.GetName().Name)
+    do assert (typeof<TpRuntime>.Assembly.GetName().Name = thisAssembly .GetName().Name)
 
     let debuggingProvider =
         let providerType =
             ProvidedTypeDefinition(
-                asm,
+                thisAssembly,
                 providerNamespaceName,
                 providerName,
                 Some typeof<obj>,
@@ -49,9 +49,9 @@ type DebuggingProviderBase
                         Some typeof<obj>, 
                         isErased = false)
                 do populate args td
+                do asm.AddTypes [ td ]
                 td
-        )
-
+            )
         providerType
 
     do
