@@ -19,6 +19,7 @@
     <Compile Include="TpSdk\ProvidedTypes.fsi" />
     <Compile Include="TpSdk\ProvidedTypes.fs" />
     <Compile Include="DebuggingProvider.fs" />
+    <Compile Include="DebuggingSqlProvider.fs" />
   </ItemGroup>
 
   <ItemGroup>

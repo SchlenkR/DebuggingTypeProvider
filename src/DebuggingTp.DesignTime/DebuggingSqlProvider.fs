@@ -1,4 +1,6 @@
-﻿namespace DebuggingTp.DesignTime
+﻿
+
+namespace DebuggingTp.DesignTime
 
 open System.Reflection
 open ProviderImplementation.ProvidedTypes
@@ -6,12 +8,13 @@ open FSharp.Core.CompilerServices
 open DebuggingTp
 
 module Consts =
-    let providerName = "DebuggingTp"
+    let providerName = "DebuggingSqlTp"
     let providerNamespaceName = "DebuggingTp"
-    let logfileParameterName = "Logfile"
+    let connectionStringParameterName = "ConnectionString"
+    let selectScalarCommandTextParameterName = "SelectScalarCommandText"
 
 [<TypeProvider>]
-type DebuggingProviderImplementation(config : TypeProviderConfig) as this =
+type DebuggingSqlProviderImplementation(config : TypeProviderConfig) as this =
     inherit TypeProviderForNamespaces(
         config,
         assemblyReplacementMap = 
@@ -36,10 +39,13 @@ type DebuggingProviderImplementation(config : TypeProviderConfig) as this =
                 isErased = false
             )
         do providerType.DefineStaticParameters(
-            [ProvidedStaticParameter(Consts.logfileParameterName, typeof<string>)],
+            [
+                ProvidedStaticParameter(Consts.connectionStringParameterName, typeof<string>);
+                ProvidedStaticParameter(Consts.selectScalarCommandTextParameterName, typeof<string>)
+            ],
             fun typeName args ->
-                let logfile = unbox<string>(args.[0])
-                do Shared.HostInfos.writeHostingInfos logfile
+                let cs = unbox<string>(args.[0])
+                let sql = unbox<string>(args.[1])
                 let td = 
                     ProvidedTypeDefinition(
                         asm,
@@ -50,12 +56,12 @@ type DebuggingProviderImplementation(config : TypeProviderConfig) as this =
                 do
                     let p = 
                         ProvidedProperty(
-                            "HostingInfos",
+                            "SqlResult",
                             typeof<string>,
                             isStatic = true,
                             getterCode = (fun args ->
-                                <@@ "Hosting infos (runtime): " + Shared.HostInfos.getHostingInfos () @@>))
-                    p.AddXmlDoc($"Hosting infos (compile time) {Shared.HostInfos.getHostingInfos ()}")
+                                <@@ "Sql result (runtime): " + Shared.Sql.executeScalar cs sql @@>))
+                    p.AddXmlDoc($"Sql result (compile time): {Shared.Sql.executeScalar cs sql}")
                     td.AddMember p
                 td
         )

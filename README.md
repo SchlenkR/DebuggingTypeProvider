@@ -20,3 +20,25 @@ The `DebuggingProviderType` has a `HostingInfos` static property with
 - XML doc, giving hints about the hosting during compile time.
 - When the TP is instanciated (during compile time), the hosting infos are also written to the file given in the TP parameter.
 - During runtime, the value of the `HostingInfos` property shows runtime hosting infos.
+
+## SQL Database
+
+- Create a DB "Demo"
+- Create table:
+	``` 
+	CREATE TABLE [dbo].[DemoTable](
+		[Id] [int] NOT NULL,
+		CONSTRAINT [PK_DemoTable] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		)	WITH (
+			PAD_INDEX = OFF, 
+			STATISTICS_NORECOMPUTE = OFF, 
+			IGNORE_DUP_KEY = OFF, 
+			ALLOW_ROW_LOCKS = ON, 
+			ALLOW_PAGE_LOCKS = ON, 
+			OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF
+		) ON [PRIMARY]
+	) ON [PRIMARY]
+	``` 
+- Create and assign login and user "DebuggingTp" with the same password
