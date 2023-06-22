@@ -5,11 +5,6 @@ open ProviderImplementation.ProvidedTypes
 open FSharp.Core.CompilerServices
 open DebuggingTp
 
-module Consts =
-    let providerName = "DebuggingTp"
-    let providerNamespaceName = "DebuggingTp"
-    let logfileParameterName = "Logfile"
-
 [<TypeProvider>]
 type DebuggingProviderImplementation(config : TypeProviderConfig) as this =
     inherit TypeProviderForNamespaces(
@@ -20,6 +15,10 @@ type DebuggingProviderImplementation(config : TypeProviderConfig) as this =
             ],
         addDefaultProbingLocation = true
     )
+
+    let providerName = "DebuggingTp"
+    let providerNamespaceName = "DebuggingTp"
+    let logfileParameterName = "Logfile"
     
     let asm = Assembly.GetExecutingAssembly()
 
@@ -30,20 +29,20 @@ type DebuggingProviderImplementation(config : TypeProviderConfig) as this =
         let providerType =
             ProvidedTypeDefinition(
                 asm,
-                Consts.providerNamespaceName,
-                Consts.providerName,
+                providerNamespaceName,
+                providerName,
                 Some typeof<obj>,
                 isErased = false
             )
         do providerType.DefineStaticParameters(
-            [ProvidedStaticParameter(Consts.logfileParameterName, typeof<string>)],
+            [ProvidedStaticParameter(logfileParameterName, typeof<string>)],
             fun typeName args ->
                 let logfile = unbox<string>(args.[0])
                 do Shared.HostInfos.writeHostingInfos logfile
                 let td = 
                     ProvidedTypeDefinition(
                         asm,
-                        Consts.providerNamespaceName,
+                        providerNamespaceName,
                         typeName, 
                         Some typeof<obj>, 
                         isErased = false)
@@ -63,4 +62,4 @@ type DebuggingProviderImplementation(config : TypeProviderConfig) as this =
         providerType
 
     do
-        this.AddNamespace(Consts.providerNamespaceName, [debuggingProvider])
+        this.AddNamespace(providerNamespaceName, [debuggingProvider])

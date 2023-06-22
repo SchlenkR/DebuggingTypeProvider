@@ -1,17 +1,9 @@
-﻿
-
-namespace DebuggingTp.DesignTime
+﻿namespace DebuggingTp.DesignTime
 
 open System.Reflection
 open ProviderImplementation.ProvidedTypes
 open FSharp.Core.CompilerServices
 open DebuggingTp
-
-module Consts =
-    let providerName = "DebuggingSqlTp"
-    let providerNamespaceName = "DebuggingTp"
-    let connectionStringParameterName = "ConnectionString"
-    let selectScalarCommandTextParameterName = "SelectScalarCommandText"
 
 [<TypeProvider>]
 type DebuggingSqlProviderImplementation(config : TypeProviderConfig) as this =
@@ -24,6 +16,11 @@ type DebuggingSqlProviderImplementation(config : TypeProviderConfig) as this =
         addDefaultProbingLocation = true
     )
     
+    let providerName = "DebuggingSqlTp"
+    let providerNamespaceName = "DebuggingTp"
+    let connectionStringParameterName = "ConnectionString"
+    let selectScalarCommandTextParameterName = "SelectScalarCommandText"
+
     let asm = Assembly.GetExecutingAssembly()
 
     // check we contain a copy of runtime files, and are not referencing the runtime DLL
@@ -33,15 +30,15 @@ type DebuggingSqlProviderImplementation(config : TypeProviderConfig) as this =
         let providerType =
             ProvidedTypeDefinition(
                 asm,
-                Consts.providerNamespaceName,
-                Consts.providerName,
+                providerNamespaceName,
+                providerName,
                 Some typeof<obj>,
                 isErased = false
             )
         do providerType.DefineStaticParameters(
             [
-                ProvidedStaticParameter(Consts.connectionStringParameterName, typeof<string>);
-                ProvidedStaticParameter(Consts.selectScalarCommandTextParameterName, typeof<string>)
+                ProvidedStaticParameter(connectionStringParameterName, typeof<string>);
+                ProvidedStaticParameter(selectScalarCommandTextParameterName, typeof<string>)
             ],
             fun typeName args ->
                 let cs = unbox<string>(args.[0])
@@ -49,7 +46,7 @@ type DebuggingSqlProviderImplementation(config : TypeProviderConfig) as this =
                 let td = 
                     ProvidedTypeDefinition(
                         asm,
-                        Consts.providerNamespaceName,
+                        providerNamespaceName,
                         typeName, 
                         Some typeof<obj>, 
                         isErased = false)
@@ -69,4 +66,4 @@ type DebuggingSqlProviderImplementation(config : TypeProviderConfig) as this =
         providerType
 
     do
-        this.AddNamespace(Consts.providerNamespaceName, [debuggingProvider])
+        this.AddNamespace(providerNamespaceName, [debuggingProvider])

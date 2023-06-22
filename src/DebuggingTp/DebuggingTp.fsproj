@@ -19,21 +19,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="TpDesignTimeDeps\FParsec.dll" Pack="true" PackagePath="\typeproviders\fsharp41\netstandard2.0" />
-    <None Include="TpDesignTimeDeps\FParsecCS.dll" Pack="true" PackagePath="\typeproviders\fsharp41\netstandard2.0" />
+    <!--<None Include="TpDesignTimeDeps\FParsec.dll" Pack="true" PackagePath="\typeproviders\fsharp41\netstandard2.0" />-->
+    <!--<None Include="TpDesignTimeDeps\FParsecCS.dll" Pack="true" PackagePath="\typeproviders\fsharp41\netstandard2.0" />-->
+    <!--<None Include="*.fsproj; *.fs; *.js;" Exclude="**\*.fs.js" PackagePath="fable\" />-->
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="FParsec">
-      <HintPath>TpDesignTimeDeps\FParsec.dll</HintPath>
-    </Reference>
-    <Reference Include="FParsecCS">
-      <HintPath>TpDesignTimeDeps\FParsecCS.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1">
+      <IncludeAssets>compile</IncludeAssets>
+      <!--<ExcludeAssets>runtime;contentFiles</ExcludeAssets>-->
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

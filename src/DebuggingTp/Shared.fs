@@ -11,10 +11,10 @@ module HostInfos =
     let getHostingInfos () =
         let sb = new StringBuilder()
         let print text = sb.AppendLine text |> ignore
-
         let printLoc ctx (asm: Assembly) =
             print $"""Location of '{ctx}' = {if asm = null then "null" else asm.Location}"""
 
+        print $"----- {DateTime.Now}"
         let entryAsm = Assembly.GetEntryAssembly()
 
         try
@@ -27,10 +27,12 @@ module HostInfos =
         printLoc "EntryAsm" entryAsm
         printLoc "typeof<string>.Assembly" typeof<string>.Assembly
 
+        print $"-----------------------"
+
         sb.ToString()
 
     let writeHostingInfos logfile =
-        do File.WriteAllText(logfile, getHostingInfos ())
+        do File.AppendAllText(logfile, getHostingInfos())
 
 module Sql =
     open Microsoft.Data
