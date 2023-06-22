@@ -14,10 +14,11 @@ let [<Literal>] Cs =
     """
 let [<Literal>] Sql = 
     "select count(*) from DemoTable"
-type TSql = DebuggingTp.DebuggingSqlTp<Cs, Sql>
+//type TSql = DebuggingTp.DebuggingSqlTp<Cs, Sql>
     
     
 [<EntryPoint>]
 let main _ =
     printfn "%s" (THostInfos.HostingInfos)
+    //printfn "%s" (TSql.SqlResult)
     0

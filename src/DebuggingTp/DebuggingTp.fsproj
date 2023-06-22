@@ -26,8 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1">
-      <IncludeAssets>compile</IncludeAssets>
-      <!--<ExcludeAssets>runtime;contentFiles</ExcludeAssets>-->
+      <ExcludeAssets>runtime;contentFiles</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
 

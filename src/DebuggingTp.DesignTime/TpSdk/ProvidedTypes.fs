@@ -629,8 +629,8 @@ type ProvidedTypeSymbol(kind: ProvidedTypeSymbolKind, typeArgs: Type list, typeB
     override __.GetArrayRank() = (match kind with ProvidedTypeSymbolKind.Array n -> n | ProvidedTypeSymbolKind.SDArray -> 1 | _ -> failwithf "non-array type '%O'" this)
     override __.IsValueTypeImpl() = (match kind with ProvidedTypeSymbolKind.Generic gtd -> gtd.IsValueType | _ -> false)
     override __.IsArrayImpl() = (match kind with ProvidedTypeSymbolKind.Array _ | ProvidedTypeSymbolKind.SDArray -> true | _ -> false)
-    override __.IsByRefImpl() = (match kind with ProvidedTypeSymbolKind.ByRef _ -> true | _ -> false)
-    override __.IsPointerImpl() = (match kind with ProvidedTypeSymbolKind.Pointer _ -> true | _ -> false)
+    override __.IsByRefImpl() = (match kind with ProvidedTypeSymbolKind.ByRef -> true | _ -> false)
+    override __.IsPointerImpl() = (match kind with ProvidedTypeSymbolKind.Pointer -> true | _ -> false)
     override __.IsPrimitiveImpl() = false
     override __.IsGenericType = (match kind with ProvidedTypeSymbolKind.Generic _ -> true | _ -> false)
     override this.GetGenericArguments() = (match kind with ProvidedTypeSymbolKind.Generic _ -> typeArgs |  _ -> failwithf "non-generic type '%O'" this)
@@ -1313,16 +1313,17 @@ and ProvidedMeasureBuilder() =
     // there seems to be no way to check if a type abbreviation exists
     static let unitNamesTypeAbbreviations =
         [
-            "meter"; "hertz"; "newton"; "pascal"; "joule"; "watt"; "coulomb";
-            "volt"; "farad"; "ohm"; "siemens"; "weber"; "tesla"; "henry"
-            "lumen"; "lux"; "becquerel"; "gray"; "sievert"; "katal"
+             "metre"; "meter"; "kilogram"; "second"; "ampere"; "kelvin"; "mole"; "candela"
+             "hertz"; "newton"; "pascal"; "joule"; "watt"; "coulomb"; "volt"; "farad"
+             "ohm"; "siemens"; "weber"; "tesla"; "henry"; "lumen"; "lux"; "becquerel"
+             "gray"; "sievert"; "katal"
         ]
         |> Set.ofList
 
     static let unitSymbolsTypeAbbreviations =
         [
             "m"; "kg"; "s"; "A"; "K"; "mol"; "cd"; "Hz"; "N"; "Pa"; "J"; "W"; "C"
-            "V"; "F"; "S"; "Wb"; "T"; "lm"; "lx"; "Bq"; "Gy"; "Sv"; "kat"; "H"
+            "V"; "F"; "S"; "ohm"; "Wb"; "T"; "lm"; "lx"; "Bq"; "Gy"; "Sv"; "kat"; "H"
         ]
         |> Set.ofList 
 
@@ -7335,8 +7336,8 @@ namespace ProviderImplementation.ProvidedTypes
         override __.GetArrayRank() = (match kind with TypeSymbolKind.Array n -> n | TypeSymbolKind.SDArray -> 1 | _ -> failwithf "non-array type")
         override __.IsValueTypeImpl() = this.IsGenericType && this.GetGenericTypeDefinition().IsValueType
         override __.IsArrayImpl() = (match kind with TypeSymbolKind.Array _ | TypeSymbolKind.SDArray -> true | _ -> false)
-        override __.IsByRefImpl() = (match kind with TypeSymbolKind.ByRef _ -> true | _ -> false)
-        override __.IsPointerImpl() = (match kind with TypeSymbolKind.Pointer _ -> true | _ -> false)
+        override __.IsByRefImpl() = (match kind with TypeSymbolKind.ByRef -> true | _ -> false)
+        override __.IsPointerImpl() = (match kind with TypeSymbolKind.Pointer -> true | _ -> false)
         override __.IsPrimitiveImpl() = false
         override __.IsGenericType = (match kind with TypeSymbolKind.TargetGeneric _ | TypeSymbolKind.OtherGeneric _ -> true | _ -> false)
         override __.GetGenericArguments() = (match kind with TypeSymbolKind.TargetGeneric _ |  TypeSymbolKind.OtherGeneric _ -> typeArgs | _ -> [| |])
@@ -8445,6 +8446,7 @@ namespace ProviderImplementation.ProvidedTypes
                 let hasProvidedArguments =
                     genericArguments
                     |> List.exists (function 
+                        | :? TypeSymbol
                         | :? ProvidedTypeDefinition
                         | :? ProvidedTypeSymbol -> true
                         | _ -> false )
@@ -16108,3 +16110,4 @@ namespace ProviderImplementation.ProvidedTypes
 
 #endif 
 #endif
+

@@ -35,12 +35,13 @@ module HostInfos =
         do File.AppendAllText(logfile, getHostingInfos())
 
 module Sql =
-    open Microsoft.Data
     open Microsoft.Data.SqlClient
+
+    do AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseManagedNetworkingOnWindows", true)
     
     let executeScalar cs sql =
         try
-            use conn = SqlConnection(cs)
+            use conn = new SqlConnection(cs)
             use cmd =
                 let c = conn.CreateCommand()
                 do c.CommandText <- sql

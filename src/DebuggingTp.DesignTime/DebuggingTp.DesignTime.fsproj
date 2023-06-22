@@ -18,8 +18,7 @@
     <Compile Include="..\DebuggingTp\TpRuntime.fs" Link="DebuggingTp\TpRuntime.fs" />
     <Compile Include="TpSdk\ProvidedTypes.fsi" />
     <Compile Include="TpSdk\ProvidedTypes.fs" />
-    <Compile Include="DebuggingProvider.fs" />
-    <Compile Include="DebuggingSqlProvider.fs" />
+    <Compile Include="ProviderImplementations.fs" />
   </ItemGroup>
 
   <ItemGroup>
