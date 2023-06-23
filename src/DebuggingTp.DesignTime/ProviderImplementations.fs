@@ -28,41 +28,37 @@ type DebuggingProviderBase
     // check we contain a copy of runtime files, and are not referencing the runtime DLL
     do assert (typeof<TpRuntime>.Assembly.GetName().Name = thisAssembly .GetName().Name)
 
-    let debuggingProvider =
-        let providerType =
-            ProvidedTypeDefinition(
-                thisAssembly,
-                providerNamespaceName,
-                providerName,
-                Some typeof<obj>,
-                isErased = false
-            )
-        do providerType.DefineStaticParameters(
-            staticParams,
-            fun typeName args ->
-                let asm = ProvidedAssembly()
-                let td = 
-                    ProvidedTypeDefinition(
-                        asm,
-                        providerNamespaceName,
-                        typeName, 
-                        Some typeof<obj>, 
-                        isErased = false)
-                do populate args td
-                do asm.AddTypes [ td ]
-                td
-            )
-        providerType
-
-    do
-        this.AddNamespace(providerNamespaceName, [debuggingProvider])
+    let providerType =
+        ProvidedTypeDefinition(
+            thisAssembly,
+            providerNamespaceName,
+            providerName,
+            Some typeof<obj>,
+            isErased = false
+        )
+    do providerType.DefineStaticParameters(
+        staticParams,
+        fun typeName args ->
+            let asm = ProvidedAssembly()
+            let td = 
+                ProvidedTypeDefinition(
+                    asm,
+                    providerNamespaceName,
+                    typeName, 
+                    Some typeof<obj>, 
+                    isErased = false)
+            do populate args td
+            do asm.AddTypes [ td ]
+            td
+        )
+    do this.AddNamespace(providerNamespaceName, [providerType])
 
 [<TypeProvider>]
-type DebuggingProviderImplementation(config : TypeProviderConfig) =
+type HostingInfosProviderImplementation(config : TypeProviderConfig) =
     inherit DebuggingProviderBase(
         config, 
         "DebuggingTp", 
-        "DebuggingTp",
+        "HostingInfosProvider",
         [ ProvidedStaticParameter("Logfile", typeof<string>) ],
         fun args td ->
             let logfile = unbox<string>(args.[0])
@@ -79,11 +75,11 @@ type DebuggingProviderImplementation(config : TypeProviderConfig) =
     )
 
 [<TypeProvider>]
-type DebuggingSqlProviderImplementation(config : TypeProviderConfig) =
+type SqlClientProviderImplementation(config : TypeProviderConfig) =
     inherit DebuggingProviderBase(
         config,
-        "DebuggingSqlTp",
         "DebuggingTp",
+        "SqlClientProvider",
         [
             ProvidedStaticParameter("ConnectionString", typeof<string>);
             ProvidedStaticParameter("SelectScalarCommandText", typeof<string>)
@@ -101,3 +97,62 @@ type DebuggingSqlProviderImplementation(config : TypeProviderConfig) =
             p.AddXmlDoc($"Sql result (compile time): {Shared.Sql.executeScalar cs sql}")
             td.AddMember p
     )
+
+
+
+
+//[<TypeProvider>]
+//type DebuggingProvider2
+//    (
+//        config : TypeProviderConfig
+//    ) as this 
+//    =
+//    inherit TypeProviderForNamespaces(
+//        config,
+//        assemblyReplacementMap = 
+//            [
+//                "DebuggingTp.DesignTime", "DebuggingTp"
+//            ],
+//        addDefaultProbingLocation = true
+//    )
+
+//    let thisAssembly  = Assembly.GetExecutingAssembly()
+
+//    // check we contain a copy of runtime files, and are not referencing the runtime DLL
+//    do assert (typeof<TpRuntime>.Assembly.GetName().Name = thisAssembly .GetName().Name)
+
+//    let providerType =
+//        ProvidedTypeDefinition(
+//            thisAssembly,
+//            "NS",
+//            "DebuggingProvider2",
+//            Some typeof<obj>,
+//            isErased = false
+//        )
+//    do providerType.DefineStaticParameters(
+//        [ ProvidedStaticParameter("Logfile", typeof<string>) ],
+//        fun typeName args ->
+//            let asm = ProvidedAssembly()
+//            let td = 
+//                ProvidedTypeDefinition(
+//                    asm,
+//                    "NS",
+//                    typeName, 
+//                    Some typeof<obj>, 
+//                    isErased = false)
+//            do
+//                let logfile = unbox<string>(args.[0])
+//                do Shared.HostInfos.writeHostingInfos logfile
+//                let p = 
+//                    ProvidedProperty(
+//                        "HostingInfos",
+//                        typeof<string>,
+//                        isStatic = true,
+//                        getterCode = (fun args ->
+//                            <@@ "Hosting infos (runtime): " + Shared.HostInfos.getHostingInfos () @@>))
+//                p.AddXmlDoc($"Hosting infos (compile time) {Shared.HostInfos.getHostingInfos ()}")
+//                td.AddMember p
+//            do asm.AddTypes [ td ]
+//            td
+//        )
+//    do this.AddNamespace("NS", [providerType])

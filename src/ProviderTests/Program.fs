@@ -1,9 +1,11 @@
 ﻿module Program
 
+open System
 
 let [<Literal>] LogFileName = "c:/temp/DebuggingTp.log"
 type THostInfos = DebuggingTp.DebuggingTp<LogFileName>
-
+type THostInfos2 = NS.DebuggingProvider2<LogFileName>
+THostInfos2.HostingInfos |> ignore
 
 let [<Literal>] Cs = 
     $"""
@@ -19,6 +21,7 @@ let [<Literal>] Sql =
     
 [<EntryPoint>]
 let main _ =
-    printfn "%s" (THostInfos.HostingInfos)
+    printfn "%s" THostInfos.HostingInfos
     //printfn "%s" (TSql.SqlResult)
+    Console.ReadLine() |> ignore
     0
