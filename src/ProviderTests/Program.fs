@@ -3,9 +3,7 @@
 open System
 
 let [<Literal>] LogFileName = "c:/temp/DebuggingTp.log"
-type THostInfos = DebuggingTp.DebuggingTp<LogFileName>
-type THostInfos2 = NS.DebuggingProvider2<LogFileName>
-THostInfos2.HostingInfos |> ignore
+type THostInfos = DebuggingTp.HostingInfosProvider<LogFileName>
 
 let [<Literal>] Cs = 
     $"""
