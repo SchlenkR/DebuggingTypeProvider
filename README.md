@@ -17,28 +17,35 @@ type DebuggingProviderType = DebuggingTp.DebuggingTp<LogFileName>
 
 The `DebuggingProviderType` has a `HostingInfos` static property with
 
-- XML doc, giving hints about the hosting during compile time.
-- When the TP is instanciated (during compile time), the hosting infos are also written to the file given in the TP parameter.
+- XML doc, giving hints about the hosting during design time.
+- When the TP is instanciated (during design time), the hosting infos are also written to the file given in the TP parameter.
 - During runtime, the value of the `HostingInfos` property shows runtime hosting infos.
 
-## SQL Database
+## SQL Client
 
-- Create a DB "Demo"
-- Create table:
-	``` 
-	CREATE TABLE [dbo].[DemoTable](
-		[Id] [int] NOT NULL,
-		CONSTRAINT [PK_DemoTable] PRIMARY KEY CLUSTERED 
-		(
-			[Id] ASC
-		)	WITH (
-			PAD_INDEX = OFF, 
-			STATISTICS_NORECOMPUTE = OFF, 
-			IGNORE_DUP_KEY = OFF, 
-			ALLOW_ROW_LOCKS = ON, 
-			ALLOW_PAGE_LOCKS = ON, 
-			OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF
-		) ON [PRIMARY]
-	) ON [PRIMARY]
-	``` 
-- Create and assign login and user "DebuggingTp" with the same password
+Use an arbitrary DB and pass a CS + a query resulting in a scalar to the provider:
+
+```fsharp
+let [<Literal>] Cs = 
+    $"""
+        Server=(localdb)\MSSQLLocalDB;
+        Database=Demo;
+        User Id=DebuggingTp;
+        Password=DebuggingTp;
+    """
+let [<Literal>] Sql = "select count(*) from DemoTable"
+type TSql = DebuggingTp.SqlClientProvider<Cs, Sql>
+```
+
+...and start playing with MsSqlClient (putting files / path / setting probing paths to .tpPublish)
+
+## Test Cases
+
+Design Time:
+
+- VS 2022 (.Net FW)
+- FSI (.Net FW + dotnet)
+- Ionide (both?)
+- Rider (*)
+
+Runtime

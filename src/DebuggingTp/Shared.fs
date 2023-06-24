@@ -2,6 +2,7 @@
 
 open System
 open System.IO
+open Microsoft.FSharp.Core.CompilerServices
 
 module HostInfos =
     open System.Reflection
@@ -11,8 +12,9 @@ module HostInfos =
     let getHostingInfos () =
         let sb = new StringBuilder()
         let print text = sb.AppendLine text |> ignore
+        let printKV k v = sb.AppendLine $"%s{k} = %s{v}" |> ignore
         let printLoc ctx (asm: Assembly) =
-            print $"""Location of '{ctx}' = {if asm = null then "null" else asm.Location}"""
+            printKV $"Location of '{ctx}'" (if asm = null then "null" else asm.Location)
 
         print $"----- {DateTime.Now}"
         let entryAsm = Assembly.GetEntryAssembly()
@@ -32,7 +34,7 @@ module HostInfos =
         sb.ToString()
 
     let writeHostingInfos logfile =
-        do File.AppendAllText(logfile, getHostingInfos())
+        do File.AppendAllText(logfile, getHostingInfos ())
 
 module Sql =
     open Microsoft.Data.SqlClient

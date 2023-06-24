@@ -1,5 +1,6 @@
 ﻿namespace DebuggingTp.DesignTime
 
+open System.IO
 open System.Reflection
 open ProviderImplementation.ProvidedTypes
 open FSharp.Core.CompilerServices
@@ -26,10 +27,18 @@ type GenerativeProviderBase
         addDefaultProbingLocation = true
     )
 
+    do
+        this.RegisterProbingFolder (config.ResolutionFolder)
+
     let thisAssembly  = Assembly.GetExecutingAssembly()
 
     // check we contain a copy of runtime files, and are not referencing the runtime DLL
-    do assert (typeof<TpRuntime>.Assembly.GetName().Name = thisAssembly .GetName().Name)
+    do assert (typeof<TpRuntime>.Assembly.GetName().Name = thisAssembly.GetName().Name)
+
+    do
+        // TODO: always given?
+        let basePath = Path.GetDirectoryName(typeof<TpRuntime>.Assembly.Location)
+        this.RegisterProbingFolder(Path.Combine(basePath, @"Microsoft.Data.SqlClient-5.1.1\net461"))
 
     let providerType =
         ProvidedTypeDefinition(
@@ -66,8 +75,8 @@ type HostingInfosProviderImplementation(config : TypeProviderConfig) =
             ProvidedStaticParameter("Logfile", typeof<string>)
         ],
         fun args td ->
-            let logfile = unbox<string>(args.[0])
-            do Shared.HostInfos.writeHostingInfos logfile
+            //let logfile = unbox<string>(args.[0])
+            //do Shared.HostInfos.writeHostingInfos logfile
             let p = 
                 ProvidedProperty(
                     "HostingInfos",
@@ -75,7 +84,7 @@ type HostingInfosProviderImplementation(config : TypeProviderConfig) =
                     isStatic = true,
                     getterCode = (fun args ->
                         <@@ "Hosting infos (runtime): " + Shared.HostInfos.getHostingInfos () @@>))
-            p.AddXmlDoc($"Hosting infos (compile time) {Shared.HostInfos.getHostingInfos ()}")
+            p.AddXmlDoc($"Hosting infos (design time) {Shared.HostInfos.getHostingInfos ()} - config.ResolutionFolder = {config.ResolutionFolder} - tpRuntimeAsmLoc = {typeof<TpRuntime>.Assembly.Location}")
             td.AddMember p
     )
 
@@ -99,6 +108,6 @@ type SqlClientProviderImplementation(config : TypeProviderConfig) =
                     isStatic = true,
                     getterCode = (fun args ->
                         <@@ "Sql result (runtime): " + Shared.Sql.executeScalar cs sql @@>))
-            p.AddXmlDoc($"Sql result (compile time): {Shared.Sql.executeScalar cs sql}")
+            p.AddXmlDoc($"Sql result (design time): {Shared.Sql.executeScalar cs sql}")
             td.AddMember p
     )
